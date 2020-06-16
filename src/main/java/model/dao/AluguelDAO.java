@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import model.seletor.AluguelSeletor;
 import model.vo.Aluguel;
 import model.vo.Exemplar;
 import model.vo.Usuario;
+import util.Constants;
 
 public class AluguelDAO {
 
@@ -223,6 +225,77 @@ public class AluguelDAO {
 		}
 
 		return alugueis;
+	}
+	
+	private String criarFiltros(String sql, AluguelSeletor aluguelSeletor) {
+		boolean primeiro = true;
+		
+
+		if (aluguelSeletor.getTermoPesquisa() != null && !aluguelSeletor.getTermoPesquisa().isBlank()) {
+			sql += " WHERE ";
+			System.out.println("LivroDAO.java - Seletor Termo Pesquisa Validado");
+			if (aluguelSeletor.getBuscarPor() != null && !aluguelSeletor.getBuscarPor().isBlank()) {
+				
+				if(aluguelSeletor.getBuscarPor().equalsIgnoreCase(Constants.CODIGOUSUARIO)) {
+					System.out.println(getClass().toString() + getClass().getEnclosingMethod() + " - " + Constants.CODIGOUSUARIO);
+					sql += " idUsuario = "+ aluguelSeletor.getTermoPesquisa().toString();
+				} else if(aluguelSeletor.getBuscarPor().equalsIgnoreCase(Constants.CODIGOLIVRO)){
+					System.out.println(getClass().toString() + getClass().getEnclosingMethod() + " - " + Constants.CODIGOLIVRO);
+					sql += " idUsuario = "+ aluguelSeletor.getTermoPesquisa().toString();
+					//procurar pelo codigo do livro
+				} else {
+					System.out.println(getClass().toString() + getClass().getEnclosingMethod() + " - " + Constants.TITULO);
+					sql += " nome LIKE " + "'%"  + aluguelSeletor.getTermoPesquisa() + "%'";
+				}
+				
+				primeiro = false;
+			}
+			
+			if (seletor.getAno() != null && !seletor.getAno().isBlank()) {
+				if (!primeiro) {
+					sql += " AND ";
+				}
+				sql += " ano = " + seletor.getAno().toString();
+			}
+
+		}
+	
+		System.out.println(getClass().toString() + " - SQL FILTROS: " + sql);
+		return sql;
+	}
+
+	public ArrayList<Aluguel> consultarExemplarLivroSeletor(AluguelSeletor aluguelSeletor) {
+			Connection connection = Banco.getConnection();
+			String sql = "SELECT * FROM ALUGUEL";
+			PreparedStatement preparedStatement = Banco.getPreparedStatement(connection, sql);
+			ResultSet resultSet = null;
+			ArrayList<Aluguel> alugueis = new ArrayList<Aluguel>();
+			
+			aluguelSeletor = aluguelSeletor.validarFitros(aluguelSeletor);
+			if(aluguelSeletor.temFiltro()) {
+				sql = this.criarFiltros(sql, aluguelSeletor);
+			}
+			
+
+			try {
+				preparedStatement.setInt(1);
+				resultSet = preparedStatement.executeQuery();
+
+				while (resultSet != null && resultSet.next()) {
+					Aluguel aluguel = construirAluguelDoResultSet(resultSet);
+					alugueis.add(aluguel);
+				}
+
+			} catch (SQLException ex) {
+				System.out.println("Erro ao consultar todos os alugueis.");
+				System.out.println("Erro: " + ex.getMessage());
+			} finally {
+				Banco.closeResultSet(resultSet);
+				Banco.closePreparedStatement(preparedStatement);
+				Banco.closeConnection(connection);
+			}
+
+			return alugueis;
 	}
 
 }

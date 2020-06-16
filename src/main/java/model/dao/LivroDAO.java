@@ -161,12 +161,13 @@ public class LivroDAO {
 	private String criarFiltros(String sql, LivroSeletor seletor) {
 		boolean primeiro = true;
 		
-
+		
 		if (seletor.getTermoPesquisa() != null && !seletor.getTermoPesquisa().isBlank()) {
 			sql += " WHERE ";
 			System.out.println("LivroDAO.java - Seletor Termo Pesquisa Validado");
 			if (seletor.getBuscarPor() != null && !seletor.getBuscarPor().isBlank()) {
-
+				
+				//TODO TROCAR POR CONSTANTES E .EQUALS
 				if (seletor.getBuscarPor() == "Autor") {
 					System.out.println("LivroDAO.java - Seletor Autor");
 					sql += " autor LIKE " + "'%"  + seletor.getTermoPesquisa() + "%'";

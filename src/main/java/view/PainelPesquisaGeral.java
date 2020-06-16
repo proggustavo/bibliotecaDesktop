@@ -119,7 +119,7 @@ public class PainelPesquisaGeral extends JPanel {
 			novaLinhaDaTabela[1] = livro.getAutor();
 			novaLinhaDaTabela[2] = livro.getAno();
 			novaLinhaDaTabela[3] = 1;
-			
+			//TODO APRESENTAR NÚMERO DE EXEMPLARES
 			model.addRow(novaLinhaDaTabela);
 		}
 		

@@ -8,5 +8,8 @@ public class Constants {
 	public static final String BUSCARPORAUTOR = "AUTOR";
 	public static final String BUSCARPOREDITORA = "EDITORA";
 	public static final String BUSCARPORSESSAO = "SESSAO";
+	public static final String CODIGOUSUARIO = "Código Usuário";
+	public static final String CODIGOLIVRO = "Código Livro";
+	public static final String ATRASADO = "Atrasado";
 
 }
