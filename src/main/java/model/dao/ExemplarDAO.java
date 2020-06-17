@@ -171,7 +171,7 @@ public class ExemplarDAO {
 		
 	}
 	
-	public ArrayList<Exemplar> consultarExemplarLivroSeletor(LivroSeletor livroSeletor) {
+	private int[]  consultarIdLivrosPorSeletor(LivroSeletor livroSeletor) {
 		LivroDAO livroDAO = new LivroDAO();
 		ArrayList<Livro> livros = new ArrayList<Livro>();
 		livros = livroDAO.consultarLivrosPorSeletor(livroSeletor);
@@ -179,13 +179,19 @@ public class ExemplarDAO {
 		for (int i = 0; i < idsLivros.length; i++) {
 			idsLivros[i] = livros.get(i).getId();
 		}
-		
+		return idsLivros;
+	}
+	
+	public ArrayList<Exemplar> consultarExemplarLivroSeletor(LivroSeletor livroSeletor) {
 		Connection connection = Banco.getConnection();
-		String sql = "SELECT * FROM EXEMPLAR WHERE idLivro IN (" + Arrays.toString(idsLivros) + ");";
+		ResultSet resultSet = null;
+		
+		String sql = "SELECT * FROM EXEMPLAR WHERE idLivro IN (" + Arrays.toString(consultarIdLivrosPorSeletor(livroSeletor)) + ");";
 		sql = sql.replaceAll("\\[|\\]", "");
+		
 		PreparedStatement preparedStatement = Banco.getPreparedStatement(connection, sql,
 				PreparedStatement.RETURN_GENERATED_KEYS);
-		ResultSet resultSet = null;
+		
 		ArrayList<Exemplar> exemplares = new ArrayList<Exemplar>();
 		try {
 			resultSet = preparedStatement.executeQuery();

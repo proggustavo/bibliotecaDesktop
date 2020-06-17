@@ -5,8 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import model.seletor.AluguelSeletor;
+import model.seletor.LivroSeletor;
 import model.vo.Aluguel;
 import model.vo.Exemplar;
 import model.vo.Usuario;
@@ -112,7 +114,7 @@ public class AluguelDAO {
 		try {
 
 			aluguel.setId(resultSet.getInt("id"));
-
+			System.out.println("Construindo aluguel " + aluguel.getId());
 			Exemplar exemplar = new Exemplar();
 			exemplar.setId(resultSet.getInt("idExemplar"));
 			ExemplarDAO exemplarDAO = new ExemplarDAO();
@@ -228,8 +230,6 @@ public class AluguelDAO {
 	}
 	
 	private String criarFiltros(String sql, AluguelSeletor aluguelSeletor) {
-		boolean primeiro = true;
-		
 
 		if (aluguelSeletor.getTermoPesquisa() != null && !aluguelSeletor.getTermoPesquisa().isBlank()) {
 			sql += " WHERE ";
@@ -244,43 +244,51 @@ public class AluguelDAO {
 					sql += " idUsuario = "+ aluguelSeletor.getTermoPesquisa().toString();
 					//procurar pelo codigo do livro
 				} else {
-					System.out.println(getClass().toString() + getClass().getEnclosingMethod() + " - " + Constants.TITULO);
-					sql += " nome LIKE " + "'%"  + aluguelSeletor.getTermoPesquisa() + "%'";
+					System.out.println(getClass().toString() + " - " + Constants.TITULO);
+					sql += " idExemplar IN (" + Arrays.toString(consultarIdExemplaresPorSeletor(aluguelSeletor)) + ");";
+					sql = sql.replaceAll("\\[|\\]", "");
 				}
-				
-				primeiro = false;
 			}
 			
-			if (seletor.getAno() != null && !seletor.getAno().isBlank()) {
-				if (!primeiro) {
-					sql += " AND ";
-				}
-				sql += " ano = " + seletor.getAno().toString();
-			}
-
 		}
 	
-		System.out.println(getClass().toString() + " - SQL FILTROS: " + sql);
+		System.out.println(getClass().toString() + " Filtros Criados " + sql);
 		return sql;
 	}
+	
+	private int[] consultarIdExemplaresPorSeletor(AluguelSeletor aluguelSeletor) {
+		LivroSeletor livroSeletor = new LivroSeletor();
+		livroSeletor.setTermoPesquisa(aluguelSeletor.getTermoPesquisa());
+		livroSeletor.setBuscarPor(aluguelSeletor.getBuscarPor());
+		
+		ExemplarDAO exemplarDAO = new ExemplarDAO();
+		ArrayList<Exemplar> exemplares = new  ArrayList<Exemplar>();
+		exemplares = exemplarDAO.consultarExemplarLivroSeletor(livroSeletor);
+		
+		int[] idsExemplares = new int[exemplares.size()];
+		for (int i = 0; i < idsExemplares.length; i++) {
+			idsExemplares[i] = exemplares.get(i).getId();
+		}
+		return idsExemplares;
+		
+	}
 
-	public ArrayList<Aluguel> consultarExemplarLivroSeletor(AluguelSeletor aluguelSeletor) {
+	public ArrayList<Aluguel> consultarAluguelPorSeletor(AluguelSeletor aluguelSeletor) {
 			Connection connection = Banco.getConnection();
 			String sql = "SELECT * FROM ALUGUEL";
-			PreparedStatement preparedStatement = Banco.getPreparedStatement(connection, sql);
 			ResultSet resultSet = null;
-			ArrayList<Aluguel> alugueis = new ArrayList<Aluguel>();
-			
 			aluguelSeletor = aluguelSeletor.validarFitros(aluguelSeletor);
 			if(aluguelSeletor.temFiltro()) {
 				sql = this.criarFiltros(sql, aluguelSeletor);
 			}
 			
-
+			PreparedStatement preparedStatement = Banco.getPreparedStatement(connection, sql, 
+					PreparedStatement.RETURN_GENERATED_KEYS );
+			System.out.println("SQL FINAL - " + sql);
+			ArrayList<Aluguel> alugueis = new ArrayList<Aluguel>();
 			try {
-				preparedStatement.setInt(1);
 				resultSet = preparedStatement.executeQuery();
-
+				
 				while (resultSet != null && resultSet.next()) {
 					Aluguel aluguel = construirAluguelDoResultSet(resultSet);
 					alugueis.add(aluguel);
@@ -293,6 +301,9 @@ public class AluguelDAO {
 				Banco.closeResultSet(resultSet);
 				Banco.closePreparedStatement(preparedStatement);
 				Banco.closeConnection(connection);
+			}
+			for (Aluguel aluguel : alugueis) {
+				System.out.println(getClass() + " " + aluguel.getId());
 			}
 
 			return alugueis;

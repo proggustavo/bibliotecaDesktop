@@ -77,9 +77,9 @@ public class PainelAluguelConsulta extends JPanel {
 				aluguelSeletor.setTermoPesquisa(txtPesquisar.getText());
 				aluguelSeletor.setBuscarPor((String) cbBuscar.getSelectedItem());
 
-				AluguelController aluguelControllerontroller = new ExemplarController();
-				alugueis = aluguelControllerontroller.consultarExemplarLivroSeletor(aluguelSeletor);
-				System.out.println(alugueis.toString());
+				AluguelController aluguelControllerontroller = new AluguelController();
+				alugueis = aluguelControllerontroller.consultarAluguelPorSeletor(aluguelSeletor);
+				System.out.println(alugueis.size());
 				atualizarTabelaResultadoPesquisa();
 			}
 		});
@@ -97,7 +97,7 @@ public class PainelAluguelConsulta extends JPanel {
 		DefaultTableModel model = (DefaultTableModel) tableResultadoPesquisa.getModel();
 		
 		for (Aluguel aluguel : alugueis) {
-			
+			System.out.println(getClass() + " - Aluguel " + aluguel.getExemplar().getId());
 			Object[] novaLinhaDaTabela = new Object[5];
 			novaLinhaDaTabela[0] = aluguel.getExemplar().getLivro().getNome();
 			novaLinhaDaTabela[1] = aluguel.getDevolucaoPrevista();

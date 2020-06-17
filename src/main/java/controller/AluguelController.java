@@ -9,8 +9,8 @@ import model.vo.Aluguel;
 public class AluguelController {
 	
 	private AluguelBO aluguelBO = new AluguelBO();
-	public ArrayList<Aluguel> consultarExemplarLivroSeletor(AluguelSeletor aluguelSeletor) {
-		return aluguelBO.consultarExemplarLivroSeletor(aluguelSeletor);
+	public ArrayList<Aluguel> consultarAluguelPorSeletor(AluguelSeletor aluguelSeletor) {
+		return aluguelBO.consultarAluguelPorSeletor(aluguelSeletor);
 	}
 	
 	

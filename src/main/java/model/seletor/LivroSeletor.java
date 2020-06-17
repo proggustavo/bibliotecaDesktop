@@ -21,7 +21,7 @@ public class LivroSeletor {
 	public LivroSeletor validarFitros(LivroSeletor seletor){
 		//TODO melhorar essas verificacoes
 		seletor.setAno(
-				ano = seletor.getAno().equals(Constants.CMBANO) ? "" : seletor.getAno());
+				ano = (seletor.getAno() == null || seletor.getAno().equals(Constants.CMBANO)) ? "" : seletor.getAno());
 		seletor.setTermoPesquisa(
 				termoPesquisa = seletor.getTermoPesquisa().equals(Constants.PLACECHOLDEDRPESQUISA) ? "" : seletor.getTermoPesquisa());
 				

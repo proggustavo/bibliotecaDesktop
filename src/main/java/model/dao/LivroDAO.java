@@ -164,21 +164,21 @@ public class LivroDAO {
 		
 		if (seletor.getTermoPesquisa() != null && !seletor.getTermoPesquisa().isBlank()) {
 			sql += " WHERE ";
-			System.out.println("LivroDAO.java - Seletor Termo Pesquisa Validado");
+			System.out.println(getClass() + " Criar Filtros - Seletor Termo Pesquisa Validado");
 			if (seletor.getBuscarPor() != null && !seletor.getBuscarPor().isBlank()) {
 				
 				//TODO TROCAR POR CONSTANTES E .EQUALS
 				if (seletor.getBuscarPor() == "Autor") {
-					System.out.println("LivroDAO.java - Seletor Autor");
+					System.out.println(getClass() +" Criar Filtros - Seletor Autor");
 					sql += " autor LIKE " + "'%"  + seletor.getTermoPesquisa() + "%'";
 				}  else if (seletor.getBuscarPor() == "Editora") {
-					System.out.println("LivroDAO.java - Seletor Editora");
+					System.out.println(getClass() + " Criar Filtros - Seletor Editora");
 					sql += " editora LIKE " + "'%"  + seletor.getTermoPesquisa().toString() + "%'";
 				} else if(seletor.getBuscarPor() == "Sessão") {
-					System.out.println("LivroDAO.java - Seletor Sessão");
+					System.out.println(getClass() + " Criar Filtros - Seletor Sessão");
 					sql += " idSessao IN (SELECT ID FROM SESSAO WHERE NOME LIKE " + "'%"  + seletor.getTermoPesquisa().toString() + "%')";
 				} else {
-					System.out.println("LivroDAO.java - Seletor nome");
+					System.out.println(getClass() + " Criar Filtros - Seletor nome");
 					sql += " nome LIKE " + "'%"  + seletor.getTermoPesquisa() + "%'";
 				}
 				
@@ -194,7 +194,7 @@ public class LivroDAO {
 
 		}
 	
-		System.out.println(	getClass().toString() + " SQL FILTROS: " + sql);
+		System.out.println(getClass().toString() + "Filtros Criados - " + sql);
 		return sql;
 	}
 
